@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <div class="container">
+
+        <!-- 管理User数据 -->
+        <h1 class="title">User Manager</h1>
+        <!-- 筛选User数据 -->
+        <h2>Select User ID Range</h2>
+        <form action="{{ url_for('index') }}" method="get">
+            <div class="field">
+                <div class="control">
+                    <label class="label">Min ID: </label>
+                    <input class="input" type="number" name="user_min_id" value="{{ user_min_id }}" placeholder="Min ID" required>
+                    <label class="label">Max ID: </label>
+                    <input class="input" type="number" name="user_max_id" value="{{ user_max_id }}" placeholder="Max ID" required>
+                </div>
+            </div>
+            <div class="control">
+                <button class="button is-link" type="submit">Filter Users</button>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset</a>
+            </div>
+        </form>
+        <!-- 展示User数据 -->
+        <table class="table is-striped">
+            <!-- 表头 -->
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Registered On</th>
+                    <th>Group</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <!-- 表身 -->
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.registed_on.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ user.group.name if user.group else 'None' }}</td>
+                        <td id="actions">
+                            <button class="button is-small is-info" onclick="openUserModal({{ user.id }}, '{{ user.name }}', '{{ user.group_id }}', 'edit')">Edit</button>
+                            <button class="button is-small is-danger" onclick="deleteUser({{ user.id }})">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- 添加User数据 -->
+        <button class="button is-primary" onclick="openUserModal(null, '', null, 'add')">Add User</button>
+
+        <!-- 管理Group数据 -->
+        <h1 class="title">Group Manager</h1>
+        <!-- 筛选Group数据 -->
+        <h2>Select Group Create Date Range</h2>
+        <form action="{{ url_for('index') }}" method="get">
+            <div class="field">
+                <div class="control">
+                    <label class="label">Start Date: </label>
+                    <input class="input" type="date" name="group_start_date" value="{{ group_start_date }}">
+                    <label class="label">End Date: </label>
+                    <input class="input" type="date" name="group_end_date" value="{{ group_end_date }}">
+                </div>
+            </div>
+            <div class="control">
+                <button class="button is-link" type="submit">Filter Groups</button>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset</a>
+            </div>
+        </form>
+        <!-- 展示Group数据 -->
+        <table class="table is-striped">
+            <!-- 表头 -->
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Created On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <!-- 表身 -->
+            <tbody>
+                {% for group in groups %}
+                    <tr>
+                        <td>{{ group.id }}</td>
+                        <td>{{ group.name }}</td>
+                        <td>{{ group.created_on.strftime('%Y-%m-%d') }}</td>
+                        <td id="actions">
+                            <!-- 注意匹配 openGroupModal，和 deleteGroup函数-->
+                            <button class="button is-small is-info" onclick="openGroupModal({{ group.id }}, '{{ group.name }}', 'edit')">Edit</button>
+                            <button class="button is-small is-danger" onclick="deleteGroup({{ group.id }})">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- 添加Group数据 -->
+        <button class="button is-primary" onclick="openGroupModal(null, '', 'add')">Add Group</button>
+    </div>
+
+    <!-- 模态框 -->
+    {% include 'user_modal.html' %}
+    {% include 'group_modal.html' %}
+
+    <!--主页脚本-->
+    <script src="{{ url_for('static', filename='js/index.js') }}" defer></script>
+</body>
+</html>

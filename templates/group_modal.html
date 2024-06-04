@@ -1,0 +1,33 @@
+<!--模态框样式-->
+<!--<link rel="stylesheet" href="static/modal.css">-->
+
+<div id="groupModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-cntent">
+        <div class="box">
+            <h2 id="groupModalTitle" class="title"></h2>
+            <input type="hidden" id="groupId">
+            <!-- 为每个输入框划分区块 -->
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="groupName">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Created On</label>
+                <div class="control">
+                    <input class="input" type="text" id="groupCreatedOn" readonly>
+                </div>
+            </div>
+            <div class="control">
+                <button id="modalSubmitButton" class="button is-primary" onclick="submitGroup()">Changes</button>
+                <button class="button" onclick="closeGroupModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeGroupModal()"></button>
+</div>
+
+<!--模态框脚本-->
+<script src="{{ url_for('static', filename='js/group_modal.js') }}" defer></script>

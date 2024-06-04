@@ -1,0 +1,48 @@
+<!--模态框样式-->
+<!--<link rel="stylesheet" href="static/css/modal.css">-->
+
+<div id="userModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-cntent">
+        <div class="box">
+            <h2 id="userModalTitle" class="title"></h2>
+            <input type="hidden" id="userId">
+            <!-- 为每个输入框划分区块 -->
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input class="input" type="text" id="userName">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Registered On</label>
+                <div class="control">
+                    <input class="input" type="text" id="userRegisteredOn" readonly>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Group</label>
+                <div class="control">
+                    <div class="select">
+                        <!-- Group 下拉选框 -->
+                        <select id="userGroup">
+                            <option value="None">None</option>
+                            {% for group in groups %}
+                                <!-- 选项名为name，以id赋值 -->
+                                <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="control">
+                <button id="modalSubmitButton" class="button is-primary" onclick="submitUser()">Changes</button>
+                <button class="button" onclick="closeUserModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="closeUserModal()"></button>
+</div>
+
+<!--模态框脚本-->
+<script src="{{ url_for('static', filename='js/user_modal.js') }}" defer></script>
