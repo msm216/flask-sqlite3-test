@@ -3,25 +3,26 @@
 
 <div id="groupModal" class="modal">
     <div class="modal-background"></div>
-    <div class="modal-cntent">
+    <div class="modal-content">
         <div class="box">
             <h2 id="groupModalTitle" class="title"></h2>
             <input type="hidden" id="groupId">
+            <input type="hidden" id="groupModalMode">
             <!-- 为每个输入框划分区块 -->
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" id="groupName">
+                    <input class="input" type="text" id="groupName" placeholder="group name" title="group name" required>
                 </div>
             </div>
             <div class="field">
                 <label class="label">Created On</label>
                 <div class="control">
-                    <input class="input" type="text" id="groupCreatedOn" readonly>
+                    <input class="input" type="date" id="groupCreatedOn" title="registered date">
                 </div>
             </div>
             <div class="control">
-                <button id="modalSubmitButton" class="button is-primary" onclick="submitGroup()">Changes</button>
+                <button id="groupModalSubmitButton" class="button is-primary" onclick="submitGroup()">Change</button>
                 <button class="button" onclick="closeGroupModal()">Cancel</button>
             </div>
         </div>

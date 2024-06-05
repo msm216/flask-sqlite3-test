@@ -3,21 +3,22 @@
 
 <div id="userModal" class="modal">
     <div class="modal-background"></div>
-    <div class="modal-cntent">
+    <div class="modal-content">
         <div class="box">
             <h2 id="userModalTitle" class="title"></h2>
             <input type="hidden" id="userId">
+            <input type="hidden" id="userModalMode">
             <!-- 为每个输入框划分区块 -->
             <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
-                    <input class="input" type="text" id="userName">
+                    <input class="input" type="text" id="userName" placeholder="user name" title="user name">
                 </div>
             </div>
             <div class="field">
                 <label class="label">Registered On</label>
                 <div class="control">
-                    <input class="input" type="text" id="userRegisteredOn" readonly>
+                    <input class="input" type="date" id="userRegisteredOn" title="registered date">
                 </div>
             </div>
             <div class="field">
@@ -25,7 +26,7 @@
                 <div class="control">
                     <div class="select">
                         <!-- Group 下拉选框 -->
-                        <select id="userGroup">
+                        <select id="userGroupID">
                             <option value="None">None</option>
                             {% for group in groups %}
                                 <!-- 选项名为name，以id赋值 -->
@@ -36,7 +37,7 @@
                 </div>
             </div>
             <div class="control">
-                <button id="modalSubmitButton" class="button is-primary" onclick="submitUser()">Changes</button>
+                <button id="userModalSubmitButton" class="button is-primary" onclick="submitUser()">Change</button>
                 <button class="button" onclick="closeUserModal()">Cancel</button>
             </div>
         </div>

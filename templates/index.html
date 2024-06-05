@@ -16,15 +16,13 @@
         <form action="{{ url_for('index') }}" method="get">
             <div class="field">
                 <div class="control">
-                    <label class="label">Min ID: </label>
-                    <input class="input" type="number" name="user_min_id" value="{{ user_min_id }}" placeholder="Min ID" required>
-                    <label class="label">Max ID: </label>
-                    <input class="input" type="number" name="user_max_id" value="{{ user_max_id }}" placeholder="Max ID" required>
+                    <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="Min ID"  title="min id" required>
+                    <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="Max ID"  title="max id" required>
                 </div>
             </div>
             <div class="control">
                 <button class="button is-link" type="submit">Filter Users</button>
-                <a href="{{ url_for('index') }}" class="button is-light">Reset</a>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
         <!-- 展示User数据 -->
@@ -42,13 +40,15 @@
             <!-- 表身 -->
             <tbody>
                 {% for user in users %}
+                    {% set registered_date = user.registered_on.strftime('%Y-%m-%d') %}
+                    {% set user_group_id = user.group.id if user.group else 'None' %}
                     <tr>
                         <td>{{ user.id }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.registed_on.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ user.name }}</td>  
+                        <td>{{ registered_date }}</td>
                         <td>{{ user.group.name if user.group else 'None' }}</td>
                         <td id="actions">
-                            <button class="button is-small is-info" onclick="openUserModal({{ user.id }}, '{{ user.name }}', '{{ user.group_id }}', 'edit')">Edit</button>
+                            <button class="button is-small is-info" onclick="openUserModal({{ user.id }}, '{{ user.name }}', '{{ registered_date }}', {{ user_group_id }}, 'edit')">Edit</button>
                             <button class="button is-small is-danger" onclick="deleteUser({{ user.id }})">Delete</button>
                         </td>
                     </tr>
@@ -56,7 +56,7 @@
             </tbody>
         </table>
         <!-- 添加User数据 -->
-        <button class="button is-primary" onclick="openUserModal(null, '', null, 'add')">Add User</button>
+        <button class="button is-primary" onclick="openUserModal(null, '', '', '', 'add')">Add User</button>
 
         <!-- 管理Group数据 -->
         <h1 class="title">Group Manager</h1>
@@ -65,15 +65,13 @@
         <form action="{{ url_for('index') }}" method="get">
             <div class="field">
                 <div class="control">
-                    <label class="label">Start Date: </label>
-                    <input class="input" type="date" name="group_start_date" value="{{ group_start_date }}">
-                    <label class="label">End Date: </label>
-                    <input class="input" type="date" name="group_end_date" value="{{ group_end_date }}">
+                    <input class="input" type="date" name="start_date" value="{{ group_start_date }}" title="start date" required>
+                    <input class="input" type="date" name="end_date" value="{{ group_end_date }}" title="end date" required>
                 </div>
             </div>
             <div class="control">
                 <button class="button is-link" type="submit">Filter Groups</button>
-                <a href="{{ url_for('index') }}" class="button is-light">Reset</a>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
         <!-- 展示Group数据 -->
@@ -90,13 +88,14 @@
             <!-- 表身 -->
             <tbody>
                 {% for group in groups %}
+                    {% set created_date = group.created_on.strftime('%Y-%m-%d') %}
                     <tr>
                         <td>{{ group.id }}</td>
                         <td>{{ group.name }}</td>
-                        <td>{{ group.created_on.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ created_date }}</td>
                         <td id="actions">
                             <!-- 注意匹配 openGroupModal，和 deleteGroup函数-->
-                            <button class="button is-small is-info" onclick="openGroupModal({{ group.id }}, '{{ group.name }}', 'edit')">Edit</button>
+                            <button class="button is-small is-info" onclick="openGroupModal({{ group.id }}, '{{ group.name }}', '{{ created_date }}', 'edit')">Edit</button>
                             <button class="button is-small is-danger" onclick="deleteGroup({{ group.id }})">Delete</button>
                         </td>
                     </tr>
@@ -104,7 +103,7 @@
             </tbody>
         </table>
         <!-- 添加Group数据 -->
-        <button class="button is-primary" onclick="openGroupModal(null, '', 'add')">Add Group</button>
+        <button class="button is-primary" onclick="openGroupModal(null, '', '', 'add')">Add Group</button>
     </div>
 
     <!-- 模态框 -->

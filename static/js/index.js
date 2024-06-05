@@ -1,14 +1,14 @@
 // Add User: openModal(null, null, 'add')
 // Edit: openModal(1, 'Alice', 'edit')
-function openUserModal(id, name, group_id, registed_on, mode) {
+function openUserModal(id, name, registered_date, group_id, mode) {
     // 设置隐藏字段
     // 如果 || 左边对象为真值则以左边对象赋值，假值则用右边对象
     // 假值包括：false，0，-0，0n，null，""，undefined，NaN
     document.getElementById('userId').value = id || '';
     document.getElementById('userName').value = name || '';
+    document.getElementById('userGroupID').value = group_id || '';
     //document.getElementById('userRegisteredOn').value = id ? document.querySelector(`tr[data-id="${id}"] .registered-on`).innerText : '';
-    document.getElementById('userRegisteredOn').value = registed_on || '';
-    document.getElementById('userGroup').value = group_id || 'None';
+    document.getElementById('userRegisteredOn').value = registered_date || '';
     // 影响模态框submit功能
     document.getElementById('userModalMode').value = mode;
     // 动态调整模态框标题和按钮文本
@@ -18,6 +18,12 @@ function openUserModal(id, name, group_id, registed_on, mode) {
     document.getElementById('userModalSubmitButton').innerText = mode === 'add' ? 'Add User' : 'Save Changes';
     // 显示模态框
     document.getElementById('userModal').classList.add('is-active');
+}
+
+function confirmAction(message, callback) {
+    if (confirm(message)) {
+        callback();
+    }
 }
 
 function deleteUser(id) {
@@ -37,13 +43,21 @@ function deleteUser(id) {
     });
 }
 
-function openGroupModal(id, name, mode) {
+function openGroupModal(id, name, created_date, mode) {
+    ////////////////
+    console.log('Data to template:');
+    console.log('id:', id);
+    console.log('name:', name);
+    console.log('created_date:', created_date, 'of type: ', typeof created_date);
+    console.log('mode:', mode);
+    ////////////////
     // 设置隐藏字段
     // 如果 || 左边对象为真值则以左边对象赋值，假值则用右边对象
     // 假值包括：false，0，-0，0n，null，""，undefined，NaN
     document.getElementById('groupId').value = id || '';
     document.getElementById('groupName').value = name || '';
-    document.getElementById('groupCreatedOn').value = id ? document.querySelector(`tr[data-id="${id}"] .registered-on`).innerText : '';
+    //document.getElementById('groupCreatedOn').value = id ? document.querySelector(`tr[data-id="${id}"] .registered-on`).innerText : '';
+    document.getElementById('groupCreatedOn').value = created_date || '';
     // 影响模态框submit功能
     document.getElementById('groupModalMode').value = mode;
     // 动态调整模态框标题和按钮文本

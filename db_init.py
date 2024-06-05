@@ -43,7 +43,7 @@ def init_db():
             for name in names:
                 user = User(
                     name=name, 
-                    registed_on=generate_random_date(7), 
+                    registered_on=generate_random_date(7), 
                     group_id=random.choice(group_ids) if random.random() > 0.5 else None
                 )
                 db.session.add(user)

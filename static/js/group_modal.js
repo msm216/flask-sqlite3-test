@@ -1,8 +1,3 @@
-function confirmAction(message, callback) {
-    if (confirm(message)) {
-        callback();
-    }
-}
 
 function closeGroupModal() {
     document.getElementById('groupModal').classList.remove('is-active');
@@ -11,26 +6,35 @@ function closeGroupModal() {
 function submitGroup() {
     var id = document.getElementById('groupId').value;
     var name = document.getElementById('groupName').value;
-    var group_id = document.getElementById('groupGroup').value;
+    var created_on = document.getElementById('groupCreatedOn').value;
     var mode = document.getElementById('groupModalMode').value;
     // 根据 mode 条件赋值 url
     var url
     switch (mode) {
         case 'add':
-            url = '/add';
+            url = '/add_group';
             break;
         case 'edit':
-            url = '/edit/' + id;
+            url = '/edit_group/' + id;
             break;
         default:
             // 未知模式直接返回
             console.error('Unknown mode:', mode);
             return;
     }
+    ////////////////
+    console.log('Submitting data:')
+    console.log('id: ', id)
+    console.log('name: ', name)
+    console.log('created_date:', created_on, 'of type: ', typeof created_on);
+    console.log('mode: ', mode)
+    ////////////////
     var data = {
         name: name,
+        created_on: created_on
     };
-    confirmAction('Are you sure you want to ' + (mode === 'add' ? 'add this group?' : 'edit this group?'), function() {
+ 
+    confirmAction('Are you sure you want to ' + (mode === 'add' ? 'add this group?' : 'modify this group?'), function() {
         // 发送请求
         fetch(url, {
             method: 'POST',
