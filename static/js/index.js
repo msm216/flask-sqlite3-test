@@ -4,10 +4,9 @@ function openUserModal(id, name, registered_date, group_id, mode) {
     // 设置隐藏字段
     // 如果 || 左边对象为真值则以左边对象赋值，假值则用右边对象
     // 假值包括：false，0，-0，0n，null，""，undefined，NaN
-    document.getElementById('userId').value = id || '';
+    document.getElementById('userId').value = id;
     document.getElementById('userName').value = name || '';
-    document.getElementById('userGroupID').value = group_id || '';
-    //document.getElementById('userRegisteredOn').value = id ? document.querySelector(`tr[data-id="${id}"] .registered-on`).innerText : '';
+    document.getElementById('userGroupID').value = group_id || 0;
     document.getElementById('userRegisteredOn').value = registered_date || '';
     // 影响模态框submit功能
     document.getElementById('userModalMode').value = mode;
@@ -54,9 +53,8 @@ function openGroupModal(id, name, created_date, mode) {
     // 设置隐藏字段
     // 如果 || 左边对象为真值则以左边对象赋值，假值则用右边对象
     // 假值包括：false，0，-0，0n，null，""，undefined，NaN
-    document.getElementById('groupId').value = id || '';
+    document.getElementById('groupId').value = id;
     document.getElementById('groupName').value = name || '';
-    //document.getElementById('groupCreatedOn').value = id ? document.querySelector(`tr[data-id="${id}"] .registered-on`).innerText : '';
     document.getElementById('groupCreatedOn').value = created_date || '';
     // 影响模态框submit功能
     document.getElementById('groupModalMode').value = mode;

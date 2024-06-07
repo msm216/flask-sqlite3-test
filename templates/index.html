@@ -25,38 +25,42 @@
                 <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
-        <!-- 展示User数据 -->
-        <table class="table is-striped">
-            <!-- 表头 -->
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Registered On</th>
-                    <th>Group</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <!-- 表身 -->
-            <tbody>
-                {% for user in users %}
-                    {% set registered_date = user.registered_on.strftime('%Y-%m-%d') %}
-                    {% set user_group_id = user.group.id if user.group else 'None' %}
+        <div style="height: 400px; overflow-y: scroll;">
+            <!-- 展示User数据 -->
+            <table class="table is-striped">
+                <!-- 表头 -->
+                <thead>
                     <tr>
-                        <td>{{ user.id }}</td>
-                        <td>{{ user.name }}</td>  
-                        <td>{{ registered_date }}</td>
-                        <td>{{ user.group.name if user.group else 'None' }}</td>
-                        <td id="actions">
-                            <button class="button is-small is-info" onclick="openUserModal({{ user.id }}, '{{ user.name }}', '{{ registered_date }}', {{ user_group_id }}, 'edit')">Edit</button>
-                            <button class="button is-small is-danger" onclick="deleteUser({{ user.id }})">Delete</button>
-                        </td>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Registered On</th>
+                        <th>Group</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <!-- 表身 -->
+                <tbody>
+                    {% for user in users %}
+                        {% set user_id = user.id %}
+                        {% set registered_date = user.registered_on.strftime('%Y-%m-%d') %}
+                        {% set user_group_id = user.group_id %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.name }}</td>  
+                            <td>{{ registered_date }}</td>
+                            <!-- <td>{{ user.group.name if user.group else 'None' }}</td> -->
+                            <td>{{ user.group.name if user.group else 'None' }}</td>
+                            <td id="actions">
+                                <button class="button is-small is-info" onclick="openUserModal({{ user_id }}, '{{ user.name }}', '{{ registered_date }}', {{ user_group_id }}, 'edit')">Edit</button>
+                                <button class="button is-small is-danger" onclick="deleteUser({{ user_id }})">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <!-- 添加User数据 -->
-        <button class="button is-primary" onclick="openUserModal(null, '', '', '', 'add')">Add User</button>
+        <button class="button is-primary" onclick="openUserModal(null, '', '', 0, 'add')">Add User</button>
 
         <!-- 管理Group数据 -->
         <h1 class="title">Group Manager</h1>
@@ -74,34 +78,37 @@
                 <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
-        <!-- 展示Group数据 -->
-        <table class="table is-striped">
-            <!-- 表头 -->
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Created On</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <!-- 表身 -->
-            <tbody>
-                {% for group in groups %}
-                    {% set created_date = group.created_on.strftime('%Y-%m-%d') %}
+        <div style="height: 400px; overflow-y: scroll;">
+            <!-- 展示Group数据 -->
+            <table class="table is-striped">
+                <!-- 表头 -->
+                <thead>
                     <tr>
-                        <td>{{ group.id }}</td>
-                        <td>{{ group.name }}</td>
-                        <td>{{ created_date }}</td>
-                        <td id="actions">
-                            <!-- 注意匹配 openGroupModal，和 deleteGroup函数-->
-                            <button class="button is-small is-info" onclick="openGroupModal({{ group.id }}, '{{ group.name }}', '{{ created_date }}', 'edit')">Edit</button>
-                            <button class="button is-small is-danger" onclick="deleteGroup({{ group.id }})">Delete</button>
-                        </td>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Created On</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <!-- 表身 -->
+                <tbody>
+                    {% for group in groups %}
+                        {% set group_id = group.id %}
+                        {% set created_date = group.created_on.strftime('%Y-%m-%d') %}
+                        <tr>
+                            <td>{{ group.id }}</td>
+                            <td>{{ group.name }}</td>
+                            <td>{{ created_date }}</td>
+                            <td id="actions">
+                                <!-- 注意匹配 openGroupModal，和 deleteGroup函数-->
+                                <button class="button is-small is-info" onclick="openGroupModal({{ group_id }}, '{{ group.name }}', '{{ created_date }}', 'edit')">Edit</button>
+                                <button class="button is-small is-danger" onclick="deleteGroup({{ group_id }})">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <!-- 添加Group数据 -->
         <button class="button is-primary" onclick="openGroupModal(null, '', '', 'add')">Add Group</button>
     </div>

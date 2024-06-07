@@ -44,7 +44,8 @@ def init_db():
                 user = User(
                     name=name, 
                     registered_on=generate_random_date(7), 
-                    group_id=random.choice(group_ids) if random.random() > 0.5 else None
+                    # 随机概率0.5不分到任何组
+                    group_id=random.choice(group_ids) if random.random() > 0.5 else 0
                 )
                 db.session.add(user)
             db.session.commit()
