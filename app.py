@@ -52,11 +52,10 @@ def index():
     user_min_id = request.args.get('min_id', default=1, type=int)
     user_max_id = request.args.get('max_id', default=999999, type=int)
     print(f"Selecting user ID between {user_min_id} and {user_max_id}.")
-    #filtered_users = User.query.filter(User.id.between(user_min_id, user_max_id)).all()
     user_id_query = User.query.filter(User.id.between(user_min_id, user_max_id))
+
     ###### filter user by group ######
-    #group_filter = request.args.get('group_select', default=None, type=int)
-    group_ids = request.args.getlist('group_select', type=int)
+    group_ids = request.args.getlist('group_select', type=int)    # 根据 name 属性选择？
     print(f"Selecting user in groups: {group_ids}")
     if group_ids:
         user_id_query = user_id_query.filter(User.group_id.in_(group_ids))
@@ -68,7 +67,7 @@ def index():
     print(f"Selecting user registered from {group_start_date} to {group_end_date}.")
     filtered_groups = Group.query.filter(Group.created_on.between(
         datetime.strptime(group_start_date, '%Y-%m-%d').date(), 
-        datetime.strptime(group_end_date, '%Y-%m-%d').date()+timedelta(days=1))).all()
+        datetime.strptime(group_end_date, '%Y-%m-%d').date() + timedelta(days=1))).all()
     
     return render_template('index.html', 
                            users=filtered_users, 

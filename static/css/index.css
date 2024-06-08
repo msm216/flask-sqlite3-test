@@ -6,22 +6,79 @@ th {
     z-index: 1;
 }
 
-/* 设置最大宽度 */
+/* 设置 input 最大宽度 */
 .input-width-limited {
     max-width: 150px;
 }
 
-.custom-select {
-    height: 150px; /* 设置 select 元素的高度，使其与两个 input 叠加后的高度相等 */
-    width: 150px; /* 设置 select 元素的宽度 */
-}
 
 .field-horizontal {
     display: flex;
     align-items: flex-start; /* 顶部对齐 */
 }
-
 .field-vertical {
     display: flex;
     flex-direction: column;
+}
+
+
+
+
+
+/* 多选菜单方案1 */
+.custom-dropdown {
+    position: relative;
+    z-index: 1000;      /* 使下拉菜单位于上层 */
+    display: inline-block;
+}
+/* 隐藏和显示下拉菜单的内容 */
+.dropdown-content {
+    display: none; /* 初始状态为不显示 */
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000;      /* 使下拉菜单位于上层 */
+    max-height: 160px; /* 设置最大高度 */
+    overflow-y: auto; /* 允许垂直滚动 */
+}
+/* 赋予 dropdown-content 样式 */
+.dropdown-content label {
+    display: block;
+    padding: 8px;
+}
+/* 赋予 dropdown-content 复选框类型 */
+.dropdown-content input[type="checkbox"] {
+    margin-right: 10px;
+}
+/* 鼠标悬停在 custom-dropdown 上时通过hover伪类显示 dropdown-content */
+.custom-dropdown:hover .dropdown-content {
+    display: block;
+}
+.dropdown-content label:hover {
+    background-color: #ddd;
+}
+
+
+
+/* 多选菜单方案2 */
+.custom-dropdown-menu {
+    display: none; /* 初始状态为不显示 */
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-height: 200px; /* 可选：设置最大高度，超出部分滚动 */
+    overflow-y: auto;  /* 可选：超出部分滚动 */
+}
+/* 显示下拉菜单 */
+.custom-dropdown-menu.show {
+    display: block;
+}
+.dropdown-toggle {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 8px;
+    cursor: pointer;
 }

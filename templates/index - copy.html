@@ -11,65 +11,46 @@
     <div class="container">
         <h1 class="title">User Manager</h1>
         <!-- 筛选User数据 -->
-        <form id="userFilterForm" action="{{ url_for('index') }}" method="get">
-            <div class="field-horizontal">
-                <div class="field-vertical">
-                    <!-- 根据id筛选 -->
-                    <h2>Select User ID Range</h2>
-                    <div class="control">
-                        <label for="min_id">Min ID</label>
-                        <!-- <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="min id"  title="min id"> -->
-                        <input class="input input-width-limited" type="number" name="min_id" value="{{ request.args.get('min_id', '') }}" placeholder="Min ID" title="min id">
-                    </div>
-                    <div class="control">
-                        <label for="max_id">Max ID</label>
-                        <!-- <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="max id"  title="max id"> -->
-                        <input class="input input-width-limited" type="number" name="max_id" value="{{ request.args.get('max_id', '') }}" placeholder="Max ID" title="max id">
-                    </div>
-                </div>
-                <div class="field-vertical">
-                    <!-- 根据group筛选 -->
-                    <div class="control custom-dropdown">
-                        <!-- 根据group筛选 -->
-                        <button class="button is-link" type="button">Select Groups</button>
-                        <div class="dropdown-content">
-                            {% for group in groups %}
-                                <label>
-                                    <input type="checkbox" class= "group-checkbox" value="{{ group.id }}" {% if group.id in group_ids %}checked{% endif %}>
-                                    {{ group.name }}
-                                </label>
-                            {% endfor %}
+        <form action="{{ url_for('index') }}" method="get">
+            <div class="columns">  
+                <div class="column is-narrow">
+                    <div class="field-horizontal">
+                        <div class="field-vertical">
+                            <!-- 根据id筛选 -->
+                            <h2>Select User ID Range</h2>
+                            <div class="control">
+                                <!-- <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="min id"  title="min id"> -->
+                                <input class="input input-width-limited" type="number" name="min_id" value="{{ request.args.get('min_id', '') }}" placeholder="Min ID" title="min id">
+                            </div>
+                            <div class="control">
+                                <!-- <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="max id"  title="max id"> -->
+                                <input class="input input-width-limited" type="number" name="max_id" value="{{ request.args.get('max_id', '') }}" placeholder="Max ID" title="max id">
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="field-vertical">
-                    <div class="control">
-                        <h2>Select Group(s)</h2>
-                        <div class="custom-dropdown">
-                            <button type="button" class="dropdown-toggle">Select Groups</button>
-                            <!-- 包装复选框列表，初始状态下隐藏 -->
-                            <div class="custom-dropdown-menu">
-                                {% for group in groups %}
-                                    <label class="checkbox">
-                                        <input type="checkbox" class="group-checkbox" value="{{ group.id }}" 
-                                            {% if group.id in group_ids %}checked{% endif %}>
-                                        {{ group.name }}
-                                    </label>
-                                {% endfor %}
+                        <div class="field-vertical">
+                            <!-- 根据group筛选 -->
+                            <h2>Select Group(s)</h2>
+                            <div class="control">
+                                <div class="select is-multiple custom-select">
+                                    <select name="group_select" multiple>
+                                        {% for group in groups %}
+                                            <option value="{{ group.id }}" {% if group.id in group_list %}selected{% endif %}>{{ group.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="field-horizontal">
-                <div class="control">
-                    <button class="button is-link" type="submit">Filter Users</button>
-                    <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
-                </div>
+            <div class="control">
+                <button class="button is-link" type="submit">Filter Users</button>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
-        <!-- 展示User数据，限制高度，带滚动条 -->
+
         <div style="height: 400px; overflow-y: scroll;">
+            <!-- 展示User数据 -->
             <table class="table is-striped">
                 <!-- 表头 -->
                 <thead>
@@ -107,24 +88,16 @@
         <h1 class="title">Group Manager</h1>
         <!-- 筛选Group数据 -->
         <h2>Select Group Create Date Range</h2>
-        <form id="group-filter-form" action="{{ url_for('index') }}" method="get">
-            <div class="field-horizontal">
-                <div class="field">
-                    <div class="control">
-                        <label for="start_date">Min ID</label>
-                        <input class="input input-width-limited" type="date" name="start_date" title="input start date" required>
-                    </div>
-                    <div class="control">
-                        <label for="end_date">Min ID</label>
-                        <input class="input input-width-limited" type="date" name="end_date" title="input end date" required>
-                    </div>
+        <form action="{{ url_for('index') }}" method="get">
+            <div class="field">
+                <div class="control">
+                    <input class="input" type="date" name="start_date" value="{{ group_start_date }}" title="start date" required>
+                    <input class="input" type="date" name="end_date" value="{{ group_end_date }}" title="end date" required>
                 </div>
             </div>
-            <div class="field-horizontal">
-                <div class="control">
-                    <button class="button is-link" type="submit">Filter Groups</button>
-                    <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
-                </div>
+            <div class="control">
+                <button class="button is-link" type="submit">Filter Groups</button>
+                <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
         <div style="height: 400px; overflow-y: scroll;">
