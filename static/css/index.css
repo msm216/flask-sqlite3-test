@@ -1,6 +1,27 @@
+/* 表头元素顶部固定 */
 th {
-    position: sticky;
+    position: sticky;   
     top: 0;
     background: white;
     z-index: 1;
+}
+
+/* 设置最大宽度 */
+.input-width-limited {
+    max-width: 150px;
+}
+
+.custom-select {
+    height: 150px; /* 设置 select 元素的高度，使其与两个 input 叠加后的高度相等 */
+    width: 150px; /* 设置 select 元素的宽度 */
+}
+
+.field-horizontal {
+    display: flex;
+    align-items: flex-start; /* 顶部对齐 */
+}
+
+.field-vertical {
+    display: flex;
+    flex-direction: column;
 }

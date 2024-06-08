@@ -72,7 +72,8 @@ def index():
     
     return render_template('index.html', 
                            users=filtered_users, 
-                           groups=filtered_groups)
+                           groups=filtered_groups,
+                           group_ids=group_ids)
 
 ######## 处理 User ########
 

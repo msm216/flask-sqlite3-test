@@ -12,27 +12,34 @@
         <h1 class="title">User Manager</h1>
         <!-- 筛选User数据 -->
         <form action="{{ url_for('index') }}" method="get">
-            <!-- 根据id筛选 -->
-            <div class="field">
-                <div class="control">
-                    <h2>Select User ID Range</h2>
-                    <!-- <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="min id"  title="min id"> -->
-                    <!-- <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="max id"  title="max id"> -->
-                    <input class="input" type="number" name="min_id" value="{{ request.args.get('min_id', '') }}" placeholder="Min ID" title="min id">
-                    <input class="input" type="number" name="max_id" value="{{ request.args.get('max_id', '') }}" placeholder="Max ID" title="max id">
-                </div>
-            </div>
-            <!-- 根据group筛选 -->
-            <div class="field">
-                <div class="control">
-                    <h2>Select Group(s)</h2>
-                    <div class="select is-multiple">
-                        <select name="group_select" multiple>
-                            {% for group in groups %}
-                                {% set group_list = request.args.getlist('group_ids', type=int) %}
-                                <option value="{{ group.id }}" {% if group.id in group_list %}selected{% endif %}>{{ group.name }}</option>
-                            {% endfor %}
-                        </select>
+            <div class="columns">  
+                <div class="column is-narrow">
+                    <div class="field-horizontal">
+                        <div class="field-vertical">
+                            <!-- 根据id筛选 -->
+                            <h2>Select User ID Range</h2>
+                            <div class="control">
+                                <!-- <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="min id"  title="min id"> -->
+                                <input class="input input-width-limited" type="number" name="min_id" value="{{ request.args.get('min_id', '') }}" placeholder="Min ID" title="min id">
+                            </div>
+                            <div class="control">
+                                <!-- <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="max id"  title="max id"> -->
+                                <input class="input input-width-limited" type="number" name="max_id" value="{{ request.args.get('max_id', '') }}" placeholder="Max ID" title="max id">
+                            </div>
+                        </div>
+                        <div class="field-vertical">
+                            <!-- 根据group筛选 -->
+                            <h2>Select Group(s)</h2>
+                            <div class="control">
+                                <div class="select is-multiple custom-select">
+                                    <select name="group_select" multiple>
+                                        {% for group in groups %}
+                                            <option value="{{ group.id }}" {% if group.id in group_list %}selected{% endif %}>{{ group.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -41,6 +48,7 @@
                 <a href="{{ url_for('index') }}" class="button is-light">Reset Filtering</a>
             </div>
         </form>
+
         <div style="height: 400px; overflow-y: scroll;">
             <!-- 展示User数据 -->
             <table class="table is-striped">
