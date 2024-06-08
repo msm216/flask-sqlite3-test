@@ -5,19 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask User Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="static/css/index.css">
 </head>
 <body>
     <div class="container">
-
-        <!-- 管理User数据 -->
         <h1 class="title">User Manager</h1>
         <!-- 筛选User数据 -->
-        <h2>Select User ID Range</h2>
         <form action="{{ url_for('index') }}" method="get">
+            <!-- 根据id筛选 -->
             <div class="field">
                 <div class="control">
-                    <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="Min ID"  title="min id" required>
-                    <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="Max ID"  title="max id" required>
+                    <h2>Select User ID Range</h2>
+                    <!-- <input class="input" type="number" name="min_id" value="{{ user_min_id }}" placeholder="min id"  title="min id"> -->
+                    <!-- <input class="input" type="number" name="max_id" value="{{ user_max_id }}" placeholder="max id"  title="max id"> -->
+                    <input class="input" type="number" name="min_id" value="{{ request.args.get('min_id', '') }}" placeholder="Min ID" title="min id">
+                    <input class="input" type="number" name="max_id" value="{{ request.args.get('max_id', '') }}" placeholder="Max ID" title="max id">
+                </div>
+            </div>
+            <!-- 根据group筛选 -->
+            <div class="field">
+                <div class="control">
+                    <h2>Select Group(s)</h2>
+                    <div class="select is-multiple">
+                        <select name="group_select" multiple>
+                            {% for group in groups %}
+                                {% set group_list = request.args.getlist('group_ids', type=int) %}
+                                <option value="{{ group.id }}" {% if group.id in group_list %}selected{% endif %}>{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="control">
@@ -48,7 +64,6 @@
                             <td>{{ user.id }}</td>
                             <td>{{ user.name }}</td>  
                             <td>{{ registered_date }}</td>
-                            <!-- <td>{{ user.group.name if user.group else 'None' }}</td> -->
                             <td>{{ user.group.name if user.group else 'None' }}</td>
                             <td id="actions">
                                 <button class="button is-small is-info" onclick="openUserModal({{ user_id }}, '{{ user.name }}', '{{ registered_date }}', {{ user_group_id }}, 'edit')">Edit</button>
@@ -60,9 +75,8 @@
             </table>
         </div>
         <!-- 添加User数据 -->
-        <button class="button is-primary" onclick="openUserModal(null, '', '', 0, 'add')">Add User</button>
+        <button class="button is-primary" onclick="openUserModal(null, '', '', null, 'add')">Add User</button>
 
-        <!-- 管理Group数据 -->
         <h1 class="title">Group Manager</h1>
         <!-- 筛选Group数据 -->
         <h2>Select Group Create Date Range</h2>

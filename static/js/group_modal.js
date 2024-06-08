@@ -5,7 +5,7 @@ function closeGroupModal() {
 
 function submitGroup() {
     var id = document.getElementById('groupId').value;
-    var name = 'Group ' + document.getElementById('groupName').value;
+    var name = 'Group ' + document.getElementById('groupName').value || '';
     // 如果获取 'groupCreatedOn' 的为空值（包括''）则以当天日期赋值
     var created_on = document.getElementById('groupCreatedOn').value || new Date().toISOString().split('T')[0];
     var mode = document.getElementById('groupModalMode').value;
@@ -24,7 +24,7 @@ function submitGroup() {
             return;
     }
     ////////////////
-    console.log('Submitting data:')
+    console.log('Submitting:')
     console.log('id: ', id)
     console.log('name: ', name)
     console.log('created_date:', created_on, 'of type: ', typeof created_on);
@@ -34,7 +34,6 @@ function submitGroup() {
         name: name,
         created_on: created_on
     };
- 
     confirmAction('Are you sure you want to ' + (mode === 'add' ? 'add this group?' : 'modify this group?'), function() {
         // 发送请求
         fetch(url, {
@@ -48,6 +47,8 @@ function submitGroup() {
         .then(data => {
             if (data.success) {
                 location.reload();
+            } else {
+                alert(data.message);
             }
         });
     });

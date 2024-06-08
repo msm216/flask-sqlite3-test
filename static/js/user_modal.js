@@ -5,7 +5,7 @@ function closeUserModal() {
 
 function submitUser() {
     var id = document.getElementById('userId').value;
-    var name = document.getElementById('userName').value;
+    var name = document.getElementById('userName').value || '';
     var group_id = document.getElementById('userGroupID').value || 0;
     // 如果获取 'userRegisteredOn' 的为空值（包括''）则以当天日期赋值
     var registered_on = document.getElementById('userRegisteredOn').value || new Date().toISOString().split('T')[0];
@@ -50,6 +50,8 @@ function submitUser() {
         .then(data => {
             if (data.success) {
                 location.reload();
+            } else {
+                alert(data.message);
             }
         });
     });

@@ -34,7 +34,7 @@ def date_for_sqlite(meta_date:str) -> datetime:
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(80), nullable=False, unique=True)
     created_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
 
 class User(db.Model):
@@ -48,23 +48,31 @@ class User(db.Model):
 
 @app.route('/')
 def index():
-    print("Selecting:")
-    ###### filter user with id ######
+    ###### filter user by id ######
     user_min_id = request.args.get('min_id', default=1, type=int)
     user_max_id = request.args.get('max_id', default=999999, type=int)
-    print(f"user_min_id: {user_min_id} ({type(user_min_id)})")
-    print(f"user_max_id: {user_max_id} ({type(user_max_id)})")
-    filtered_users = User.query.filter(User.id.between(user_min_id, user_max_id)).all()
-    ###### filter group with date ######
+    print(f"Selecting user ID between {user_min_id} and {user_max_id}.")
+    #filtered_users = User.query.filter(User.id.between(user_min_id, user_max_id)).all()
+    user_id_query = User.query.filter(User.id.between(user_min_id, user_max_id))
+    ###### filter user by group ######
+    #group_filter = request.args.get('group_select', default=None, type=int)
+    group_ids = request.args.getlist('group_select', type=int)
+    print(f"Selecting user in groups: {group_ids}")
+    if group_ids:
+        user_id_query = user_id_query.filter(User.group_id.in_(group_ids))
+    filtered_users = user_id_query.all()
+
+    ###### filter group by date ######
     group_start_date = request.args.get('start_date', default='2000-01-01', type=str)
     group_end_date = request.args.get('end_date', default=datetime.today().strftime('%Y-%m-%d'), type=str)
-    print(f"group_start_date: {group_start_date} ({type(group_start_date)})")
-    print(f"group_end_date: {group_end_date} ({type(group_end_date)})")
+    print(f"Selecting user registered from {group_start_date} to {group_end_date}.")
     filtered_groups = Group.query.filter(Group.created_on.between(
         datetime.strptime(group_start_date, '%Y-%m-%d').date(), 
         datetime.strptime(group_end_date, '%Y-%m-%d').date()+timedelta(days=1))).all()
     
-    return render_template('index.html', users=filtered_users, groups=filtered_groups)
+    return render_template('index.html', 
+                           users=filtered_users, 
+                           groups=filtered_groups)
 
 ######## 处理 User ########
 
@@ -102,13 +110,15 @@ def add_group():
     data = request.json
     new_name = data['name']
     new_date = data['created_on']
-    print("Adding:")
-    print(new_name, 'of type', type(new_name))
-    print(new_date, 'of type', type(new_date))
+    print(f"Adding new group named: '{new_name}' created on {new_date}")
+    # 判断group名是否已存在
+    existing_group = Group.query.filter_by(name=new_name).first()
+    if existing_group:
+        return jsonify({'success': False, 'message': 'Group name already exists'}), 400
     new_group = Group(name=new_name, created_on=date_for_sqlite(new_date))
     db.session.add(new_group)
     db.session.commit()
-    return jsonify(success=True)
+    return jsonify(success=True), 200
 
 @app.route('/delete_group/<int:id>', methods=['DELETE'])
 def delete_group(id):
@@ -120,17 +130,24 @@ def delete_group(id):
 
 @app.route('/edit_group/<int:id>', methods=['POST'])
 def edit_group(id):
-    group = Group.query.get(id)
-    #group = session.get(Group, id)
     data = request.json
     new_name = data['name']
     new_date = data['created_on']
-    print(new_name, 'of type', type(new_name))
-    print(new_date, 'of type', type(new_date))
-    group.name = new_name
-    group.created_on = date_for_sqlite(new_date)
-    db.session.commit()
-    return jsonify(success=True)
+    print(f"Modifying group {id} to name: '{new_name}' created on {new_date}")
+    # 判断是否存在其他名称相同的实例
+    existing_group = Group.query.filter_by(name=new_name).first()
+    if existing_group and existing_group.id != id:
+        return jsonify(success=False, message="Group name already exists"), 400
+    # 正常修改对象实例
+    group = Group.query.get(id)
+    #group = session.get(Group, id)
+    if group:
+        group.name = new_name
+        group.created_on = date_for_sqlite(new_date)
+        db.session.commit()
+        return jsonify(success=True), 200
+    # id错误
+    return jsonify(success=False, message="Group not found"), 404
 
 
 if __name__ == '__main__':
