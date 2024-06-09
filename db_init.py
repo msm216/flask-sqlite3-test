@@ -1,4 +1,6 @@
 import random
+import os
+
 from datetime import datetime, timezone, timedelta
 
 from app import app, db
@@ -18,9 +20,16 @@ def init_db():
 
     with app.app_context():
 
-        print("Dropping all tables...")
+        # 关闭会话
+        db.session.remove()
         db.drop_all()
         print("Tables dropped.")
+        db_path = 'instance\\test.db'
+        if os.path.exists(db_path):
+            os.remove(db_path)
+            print('Database file deleted successfully.')
+        else:
+            print('Database file not found.')
         print("Creating all tables...")
         db.create_all()
         print("Tables created.")

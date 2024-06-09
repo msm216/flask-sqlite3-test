@@ -33,17 +33,30 @@ def date_for_sqlite(meta_date:str) -> datetime:
 
 
 class Group(db.Model):
+    __tablename__ = 'groups'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
     created_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    first_register = db.Column(Date, nullable=True)
+    last_register = db.Column(Date, nullable=True)
+
+    # lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
+    #users = db.relationship('User', backref='user', lazy=True)
+
+    def __repr__(self):
+        return f'<Group {self.name}>'
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     registered_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), default=0)
+    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), default=0)
     # 反向关系?
     group = db.relationship('Group', backref=db.backref('users', lazy=True))
+
+    def __repr__(self):
+        return f'<User {self.name}>'
 
 
 @app.route('/')
@@ -55,8 +68,8 @@ def index():
     user_id_query = User.query.filter(User.id.between(user_min_id, user_max_id))
 
     ###### filter user by group ######
-    group_ids = request.args.getlist('group_select', type=int)    # 根据 name 属性选择？
-    print(f"Selecting user in groups: {group_ids}")
+    group_ids = request.args.getlist('group_select', type=int)    # 根据 name 属性选择
+    print(f"Selecting user in group: {group_ids}")
     if group_ids:
         user_id_query = user_id_query.filter(User.group_id.in_(group_ids))
     filtered_users = user_id_query.all()
@@ -64,7 +77,7 @@ def index():
     ###### filter group by date ######
     group_start_date = request.args.get('start_date', default='2000-01-01', type=str)
     group_end_date = request.args.get('end_date', default=datetime.today().strftime('%Y-%m-%d'), type=str)
-    print(f"Selecting user registered from {group_start_date} to {group_end_date}.")
+    print(f"Selecting group created from {group_start_date} to {group_end_date}.")
     filtered_groups = Group.query.filter(Group.created_on.between(
         datetime.strptime(group_start_date, '%Y-%m-%d').date(), 
         datetime.strptime(group_end_date, '%Y-%m-%d').date() + timedelta(days=1))).all()
