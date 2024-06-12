@@ -12,7 +12,7 @@ from sqlalchemy import cast, Date
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -20,7 +20,6 @@ db = SQLAlchemy(app)
 #engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 #Session = sessionmaker(bind=engine)
 #session = Session()
-
 
 
 # 确保日期格式为 <class 'datetime.datetime'>
@@ -33,27 +32,25 @@ def date_for_sqlite(meta_date:str) -> datetime:
 
 
 class Group(db.Model):
-    __tablename__ = 'groups'
+    __tablename__ = 'group_table'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False, unique=True)
     created_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     first_register = db.Column(Date, nullable=True)
     last_register = db.Column(Date, nullable=True)
-
-    # lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
-    #users = db.relationship('User', backref='user', lazy=True)
+    # 反向关联，lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
+    users = db.relationship('User', backref='user_group', lazy=True)
 
     def __repr__(self):
         return f'<Group {self.name}>'
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'user_table'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     registered_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), default=0)
-    # 反向关系?
-    group = db.relationship('Group', backref=db.backref('users', lazy=True))
+    group_id = db.Column(db.Integer, db.ForeignKey('group_table.id'), default=0)
+    #group = db.relationship('Group', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
         return f'<User {self.name}>'
@@ -61,6 +58,20 @@ class User(db.Model):
 
 @app.route('/')
 def index():
+    # 获取所有用户和组
+    users = User.query.all()
+    groups = Group.query.all()
+    # 更新每个组的 first_register 和 last_register
+    for group in groups:
+        group_users = [user for user in users if user.group_id == group.id]
+        if group_users:
+            group.first_register = min(user.registered_on for user in group_users)
+            group.last_register = max(user.registered_on for user in group_users)
+        else:
+            group.first_register = None
+            group.last_register = None
+    db.session.commit()
+
     ###### filter user by id ######
     user_min_id = request.args.get('min_id', default=1, type=int)
     user_max_id = request.args.get('max_id', default=999999, type=int)

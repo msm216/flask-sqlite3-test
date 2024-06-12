@@ -22,17 +22,18 @@ def init_db():
 
         # 关闭会话
         db.session.remove()
-        db.drop_all()
-        print("Tables dropped.")
-        db_path = 'instance\\test.db'
+        
+        db_path = 'instance\\app.db'
         if os.path.exists(db_path):
             os.remove(db_path)
             print('Database file deleted successfully.')
+            db.drop_all()
+            print("Tables dropped.")
+            print("Creating all tables...")
+            db.create_all()
+            print("Tables created.")
         else:
             print('Database file not found.')
-        print("Creating all tables...")
-        db.create_all()
-        print("Tables created.")
 
         # 检查 Group 表是否已有数据
         if not Group.query.first():
@@ -54,7 +55,7 @@ def init_db():
                     name=name, 
                     registered_on=generate_random_date(7), 
                     # 随机概率0.5不分到任何组
-                    group_id=random.choice(group_ids) if random.random() > 0.5 else 0
+                    group_id=random.choice(group_ids) if random.random() > 0.3 else 0
                 )
                 db.session.add(user)
             db.session.commit()
