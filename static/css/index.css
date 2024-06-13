@@ -69,7 +69,7 @@ th {
     border: 1px solid #ddd;
     box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     z-index: 1000;
-    max-height: 200px; /* 可选：设置最大高度，超出部分滚动 */
+    max-height: 100px; /* 可选：设置最大高度，超出部分滚动 */
     overflow-y: auto;  /* 可选：超出部分滚动 */
 }
 /* 显示下拉菜单 */

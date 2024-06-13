@@ -1,12 +1,17 @@
+import os
+import pandas as pd
+
 from datetime import datetime, timezone, timedelta
 
 from flask import Flask
 from flask import request
-from flask import render_template, redirect, url_for, jsonify
+from flask import render_template, redirect, url_for, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
+from sqlalchemy import Date
+from sqlalchemy import create_engine, cast
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import cast, Date
+from werkzeug.utils import secure_filename
+
 
 #from models import User, Group
 
@@ -14,6 +19,8 @@ from sqlalchemy import cast, Date
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = '/path/to/upload'
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
 db = SQLAlchemy(app)
 
 
@@ -21,14 +28,6 @@ db = SQLAlchemy(app)
 #Session = sessionmaker(bind=engine)
 #session = Session()
 
-
-# 确保日期格式为 <class 'datetime.datetime'>
-def date_for_sqlite(meta_date:str) -> datetime:
-    if meta_date == '':
-        new_date = datetime.now(timezone.utc)
-    else:
-        new_date = datetime.strptime(meta_date, '%Y-%m-%d')
-    return new_date
 
 
 class Group(db.Model):
@@ -99,6 +98,14 @@ def index():
                            group_ids=group_ids)
 
 ######## 处理 User ########
+
+# 确保日期格式为 <class 'datetime.datetime'>
+def date_for_sqlite(meta_date:str) -> datetime:
+    if meta_date == '':
+        new_date = datetime.now(timezone.utc)
+    else:
+        new_date = datetime.strptime(meta_date, '%Y-%m-%d')
+    return new_date
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -172,6 +179,76 @@ def edit_group(id):
         return jsonify(success=True), 200
     # id错误
     return jsonify(success=False, message="Group not found"), 404
+
+######## 处理文件上传 ########
+
+# 验证文件扩展名
+def allowed_file(filename:str) -> bool:
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv', 'xlsx'}
+
+# 根据上传的数据 DataFrame 更新表格
+def update_groups_from_dataframe(df:pd.DataFrame) -> None:
+    # 逐条遍历 DataFrame
+    for _, row in df.iterrows():
+        group_id = row['id']
+        group_name = row['name']
+        created_on = row['created_on']
+        #first_register = row.get('first_register')
+        #last_register = row.get('last_register')
+
+        # 尝试根据 id 获取数据库中已有实例
+        group = Group.query.get(group_id)
+        if group is None:
+            # 不存在同 id 实例则添加
+            group = Group(id=group_id, name=group_name, created_on=created_on)
+            print(f"Add new instance: {group}")
+            db.session.add(group)
+        else:
+            # 存在同 id 实例则更新部分属性
+            print(f"Update instance: {group}")
+            group.name = group_name
+            group.created_on = created_on
+            #group.first_register = first_register
+            #group.last_register = last_register
+            pass
+        db.session.commit()
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # 检查请求中是否包含文件，如果不存在，显示错误信息并重定向回上传页面
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # 如果文件名为空，显示错误信息并重定向回上传页面
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    # 验证文件后缀
+    if file and allowed_file(file.filename):
+        # 确保上传的文件名是安全的，并移除任何可能导致安全问题的字符
+        filename = secure_filename(file.filename)
+        # 构建文件路径
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # 处理文件
+        if filename.endswith('.csv'):
+            df = pd.read_csv(filepath, parse_dates=['created_on'])
+        elif filename.endswith('.xlsx'):
+            df = pd.read_excel(filepath, parse_dates=['created_on'])
+        else:
+            flash('Unsupported file format')
+            return redirect(request.url)
+
+        # 将文件内容更新到数据库
+        update_groups_from_dataframe(df)
+        flash('File successfully uploaded and processed')
+        return redirect(url_for('index'))
+
+    flash('File type not allowed')
+    return redirect(request.url)
+
 
 
 if __name__ == '__main__':
