@@ -3,8 +3,9 @@ import os
 
 from datetime import datetime, timezone, timedelta
 
-from app import app, db
-from app import User, Group
+#from app import app, db
+from app import create_app, db
+from app.models import User, Group
 
 
 names = ["Peter", "Stewie", "Brian", "Lois", "Meg", "Chris"]
@@ -17,24 +18,28 @@ def generate_random_date(roll_back:int) -> datetime:
 
 
 def init_db():
+    #
+    app = create_app()
 
     with app.app_context():
 
         # 关闭会话
         db.session.remove()
         
-        db_path = 'instance\\app.db'
+        #db_path = 'instance\\app.db'
+        db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+
         if os.path.exists(db_path):
             os.remove(db_path)
-            print('Database file deleted successfully.')
-            db.drop_all()
-            print("Tables dropped.")
-            print("Creating all tables...")
-            db.create_all()
-            print("Tables created.")
+            print(f'Database file removed: {db_path}')
         else:
-            print('Database file not found.')
+            print(f'Database file {db_path} not found.')
 
+        db.drop_all()
+        print("Tables dropped.")
+        db.create_all()
+        print("Tables created.")
+        
         # 检查 Group 表是否已有数据
         if not Group.query.first():
             for group in groups:

@@ -1,61 +1,18 @@
 import os
 import pandas as pd
 
-from datetime import datetime, timezone, timedelta
-
-from flask import Flask
+from datetime import datetime, timedelta, timezone
+from flask import current_app as app
 from flask import request
-from flask import render_template, redirect, url_for, jsonify, flash
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Date
-from sqlalchemy import create_engine, cast
-from sqlalchemy.orm import sessionmaker
+from flask import render_template, flash, redirect, url_for, jsonify
+#from flask import Blueprint
 from werkzeug.utils import secure_filename
 
-
-#from models import User, Group
-
-# 获取当前文件夹的绝对路径
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
-db = SQLAlchemy(app)
+from . import db
+from .models import User, Group
 
 
-#engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-#Session = sessionmaker(bind=engine)
-#session = Session()
-
-
-
-class Group(db.Model):
-    __tablename__ = 'group_table'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True)
-    created_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    first_register = db.Column(Date, nullable=True)
-    last_register = db.Column(Date, nullable=True)
-    # 反向关联，lazy='dynamic' 使得反向关系被访问时返回一个对象而不是列表
-    users = db.relationship('User', backref='user_group', lazy=True)
-
-    def __repr__(self):
-        return f'<Group {self.name}>'
-
-class User(db.Model):
-    __tablename__ = 'user_table'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
-    registered_on = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    group_id = db.Column(db.Integer, db.ForeignKey('group_table.id'), default=0)
-    #group = db.relationship('Group', backref=db.backref('users', lazy=True))
-
-    def __repr__(self):
-        return f'<User {self.name}>'
-
+#main = Blueprint('main', __name__)
 
 @app.route('/')
 def index():
@@ -250,9 +207,3 @@ def upload_file():
 
     flash('File type not allowed')
     return redirect(request.url)
-
-
-
-if __name__ == '__main__':
-
-    app.run(debug=True)
