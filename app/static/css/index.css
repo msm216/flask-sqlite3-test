@@ -28,7 +28,7 @@ th {
 /* 多选菜单方案1 */
 .custom-dropdown {
     position: relative;
-    z-index: 1000;      /* 使下拉菜单位于上层 */
+    z-index: 10;      /* 使下拉菜单位于上层 */
     display: inline-block;
 }
 /* 隐藏和显示下拉菜单的内容 */
@@ -68,7 +68,7 @@ th {
     background-color: white;
     border: 1px solid #ddd;
     box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    z-index: 1000;
+    z-index: 10;
     max-height: 100px; /* 可选：设置最大高度，超出部分滚动 */
     overflow-y: auto;  /* 可选：超出部分滚动 */
 }

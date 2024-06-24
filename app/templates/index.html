@@ -136,7 +136,8 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Created On</th>
-                        <th>First Register</th>
+                        <th>First Registration</th>
+                        <th>Last Registration</th>
                         <th>Last Register</th>
                         <th>Actions</th>
                     </tr>
@@ -150,8 +151,9 @@
                             <td>{{ group.id }}</td>
                             <td>{{ group.name }}</td>
                             <td>{{ created_date }}</td>
-                            <td>{{ group.first_register }}</td>
-                            <td>{{ group.last_register }}</td>
+                            <td>{{ group.first_regist }}</td>
+                            <td>{{ group.last_regist }}</td>
+                            <td>{{ group.last_register_name }}</td>
                             <td id="actions">
                                 <!-- 注意匹配 openGroupModal，和 deleteGroup函数-->
                                 <button class="button is-small is-info" onclick="openGroupModal({{ group_id }}, '{{ group.name }}', '{{ created_date }}', 'edit')">Edit</button>

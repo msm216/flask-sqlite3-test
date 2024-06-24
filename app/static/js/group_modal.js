@@ -5,7 +5,7 @@ function closeGroupModal() {
 
 function submitGroup() {
     var id = document.getElementById('groupId').value;
-    var name = 'Group ' + document.getElementById('groupName').value || '';
+    var name = document.getElementById('groupName').value || '';
     // 如果获取 'groupCreatedOn' 的为空值（包括''）则以当天日期赋值
     var created_on = document.getElementById('groupCreatedOn').value || new Date().toISOString().split('T')[0];
     var mode = document.getElementById('groupModalMode').value;

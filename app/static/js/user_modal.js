@@ -6,7 +6,12 @@ function closeUserModal() {
 function submitUser() {
     var id = document.getElementById('userId').value;
     var name = document.getElementById('userName').value || '';
-    var group_id = document.getElementById('userGroupID').value || 0;
+    var group_id_str = document.getElementById('userGroupID').value || 0;
+    // Ensure group_id is an integer
+    var group_id = parseInt(group_id_str, 10);
+    if (isNaN(group_id)) {
+        group_id = 0; // or any other default value
+    }
     // 如果获取 'userRegisteredOn' 的为空值（包括''）则以当天日期赋值
     var registered_on = document.getElementById('userRegisteredOn').value || new Date().toISOString().split('T')[0];
     var mode = document.getElementById('userModalMode').value;
@@ -25,7 +30,7 @@ function submitUser() {
             return;
     }
     ////////////////
-    console.log('Submitting data:')
+    console.log('Submitting User:')
     console.log('id: ', id)
     console.log('name: ', name)
     console.log('registered_on:', registered_on, 'of type: ', typeof registered_on);
