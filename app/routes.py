@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from . import db
 from .models import User, Group
+from .utilities import date_to_id, date_for_sqlite, allowed_file
 
 
 #main = Blueprint('main', __name__)
@@ -26,8 +27,6 @@ def index():
     for group in groups:
         group_users = [user for user in users if user.group_id == group.id]
         if group_users:
-            #group.first_regist = min(user.registered_on for user in group_users)
-            #group.last_regist = max(user.registered_on for user in group_users)
             first_registered_user = min(group_users, key=lambda user: user.registered_on)
             last_registered_user = max(group_users, key=lambda user: user.registered_on)
             group.first_regist = first_registered_user.registered_on
@@ -65,15 +64,8 @@ def index():
                            groups=filtered_groups,
                            group_ids=group_ids)
 
-######## 处理 User ########
 
-# 确保日期格式为 <class 'datetime.datetime'>
-def date_for_sqlite(meta_date:str) -> datetime:
-    if meta_date == '':
-        new_date = datetime.now(timezone.utc)
-    else:
-        new_date = datetime.strptime(meta_date, '%Y-%m-%d')
-    return new_date
+######## 处理 User ########
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -82,7 +74,14 @@ def add_user():
     new_date = data['registered_on']
     group_id = data['group_id'] if data['group_id'] != 'None' else None
     print(f"Adding new user\n—— named '{new_name}'\n—— registered on {new_date}\n—— in group {group_id}")
-    new_user = User(name=new_name, registered_on=date_for_sqlite(new_date), group_id=group_id)
+    # 解析传入的日期
+    registered_on = datetime.strptime(new_date, '%Y-%m-%d')
+    # 生成自定义 ID
+    sequence_number = User.query.filter(db.func.date(User.registered_on) == registered_on.date()).count() + 1
+    user_id = date_to_id("User", new_date, sequence_number)
+    # 创建新的 User 对象
+    new_user = User(id=user_id, name=new_name, registered_on=date_for_sqlite(registered_on), group_id=group_id)
+    # 添加到数据库并提交
     db.session.add(new_user)
     db.session.commit()
     return jsonify(success=True)
@@ -120,6 +119,7 @@ def edit_user(id):
     # id错误
     return jsonify(success=False, message=f"User {id} not found"), 404
 
+
 ######## 处理 Group ########
 
 @app.route('/add_group', methods=['POST'])
@@ -132,14 +132,21 @@ def add_group():
     existing_group = Group.query.filter_by(name=new_name).first()
     if existing_group:
         return jsonify({'success': False, 'message': 'Group name already exists'}), 400
-    new_group = Group(name=new_name, created_on=date_for_sqlite(new_date))
+    # 解析传入的日期
+    created_on = datetime.strptime(new_date, '%Y-%m-%d')
+    # 生成自定义 ID
+    sequence_number = Group.query.filter(db.func.date(Group.created_on) == created_on.date()).count() + 1
+    group_id = date_to_id("Group", created_on, sequence_number)
+    # 创建新的 Group 对象
+    new_group = Group(id=group_id, name=new_name, created_on=date_for_sqlite(new_date))
+    # 添加到数据库并提交
     db.session.add(new_group)
     db.session.commit()
     return jsonify(success=True), 200
 
 @app.route('/delete_group/<int:id>', methods=['DELETE'])
 def delete_group(id):
-    '''
+    
     group = Group.query.get(id)
     #group = session.get(Group, id)
     print(f"Deleting group {id}: {group.name}")
@@ -154,6 +161,7 @@ def delete_group(id):
         print(f"Deleting group {id}: {group.name}")
         # 更新所有关联的 User 实例的 group_id
         users_to_update = User.query.filter(User.group_id == id).all()
+        print(f"{len(users_to_update)} users associated with group {id}")
         for user in users_to_update:
             user.group_id = 0
         # 提交用户更新
@@ -168,7 +176,7 @@ def delete_group(id):
         db.session.rollback()
         print(f"Error deleting group: {e}")
         return jsonify({'message': 'An error occurred while deleting the group'}), 500
-
+    '''
 
 @app.route('/edit_group/<int:id>', methods=['POST'])
 def edit_group(id):
@@ -191,11 +199,8 @@ def edit_group(id):
     # id错误
     return jsonify(success=False, message=f"Group {id} not found"), 404
 
-######## 处理文件上传 ########
 
-# 验证文件扩展名
-def allowed_file(filename:str) -> bool:
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'csv', 'xlsx'}
+######## 处理文件上传 ########
 
 # 根据上传的数据 DataFrame 更新表格
 def update_groups_from_dataframe(df:pd.DataFrame) -> None:

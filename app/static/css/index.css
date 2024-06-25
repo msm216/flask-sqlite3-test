@@ -11,6 +11,14 @@ th {
     max-width: 150px;
 }
 
+/* 为指定类型的列设置宽度 */
+.table th.id-column, .table td.id-column {
+    width: 200px;
+}
+.table th.date-column, .table td.date-column {
+    width: 180px;
+}
+
 
 .field-horizontal {
     display: flex;
@@ -20,9 +28,6 @@ th {
     display: flex;
     flex-direction: column;
 }
-
-
-
 
 
 /* 多选菜单方案1 */
